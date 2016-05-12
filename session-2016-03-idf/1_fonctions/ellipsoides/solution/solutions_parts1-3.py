@@ -87,43 +87,7 @@ def rotate_2D(X, Y, theta):
     return Xr, Yr
 
 
-def superellipsoid(n, rx, ry, rz, m1, m2):
-  x = []
-  y = []
-  z = []
-  for theta in linspace(-math.pi, math.pi, n):
-    x.append([])
-    y.append([])
-    z.append([])
-    for phi in linspace(-.5*math.pi, .5*math.pi, n):
-      x[-1].append(rx*spe_cos(phi, 2./m2)*spe_cos(theta, 2./m1))
-      y[-1].append(ry*spe_cos(phi, 2./m2)*spe_sin(theta, 2./m1))
-      z[-1].append(rz*spe_sin(phi, 2./m2))
-  return x, y, z
 
-
-def myformat(values):
-    fe = ['{:+.1f}']*len(values)
-    fg = '('+', '.join(fe)+')'
-    return fg.format(*values)
-
-def myformat2d(values):
-    temp =  []
-    for v in values:
-        temp.append(myformat(v))
-    fe = ['{}']*len(temp)
-    fg = '('+', '.join(fe)+')'
-    return fg.format(*temp)
-
-
-"""
-demonstration code
-"""
-
-x, y = superellipse(5, 1, 1, 2)
-print("superellipse(5, 1, 1, 2)")
-print(myformat(x))
-print(myformat(y))
 
 from pylab import *
 
@@ -135,11 +99,3 @@ x1, y1 = rotate_2D(x, y, theta)
 plot(x1, y1, label='rotated by %.1f'%theta)
 legend(loc='best')
 
-
-""" Partie avancee """
-
-x, y, z = superellipsoid(4, 1, 1, 1, 2, 2)
-print("superellipsoid(4, 1, 1, 1, 2, 2)")
-print(myformat2d(x))
-print(myformat2d(y))
-print(myformat2d(z))

@@ -3,10 +3,10 @@
 implémentation d'une superellipsoide
 """
 
-import math
+import numpy as np
 
-from ..linspace import linspace
-from ..utils import spe_cos, spe_sin
+from utils import spe_cos, spe_sin
+from superellipse import Superellipse
 
 def beta_func(r, t):
     """
@@ -55,6 +55,8 @@ class Superellipsoid(object):
 
     cloud : renvoie le nuage de points de la surface.
 
+    cloud_with_square: renvoie les points de la surface en projetant un cube.
+
     volume : renvoie le volume de la superellipsoide.
     """
     def __init__(self, rx, ry, rz, m1, m2):
@@ -74,43 +76,10 @@ class Superellipsoid(object):
         n : nombre de points de discrétisation en theta et en phi
 
         """
-        phi_list = linspace(-.5*math.pi, .5*math.pi, n)
-        theta_list = linspace(-math.pi, math.pi, n)
-
-        x = []
-        y = []
-        z = []
-        for theta in theta_list:
-            x.append([])
-            y.append([])
-            z.append([])
-            for phi in phi_list:
-                x[-1].append(self.rx*spe_cos(phi, 2./self.m2)
-                             *spe_cos(theta, 2./self.m1))
-                y[-1].append(self.ry*spe_cos(phi, 2./self.m2)
-                             *spe_sin(theta, 2./self.m1))
-                z[-1].append(self.rz*spe_sin(phi, 2./self.m2))
+        phi = np.linspace(-.5*np.pi, .5*np.pi, n)[:, np.newaxis]
+        theta = np.linspace(-np.pi, np.pi, n)[np.newaxis, :]
+        x = self.rx*spe_cos(phi, 2./self.m2)*spe_cos(theta, 2./self.m1)
+        y = self.ry*spe_cos(phi, 2./self.m2)*spe_sin(theta, 2./self.m1)
+        z = self.rz*spe_sin(phi, 2./self.m2)*np.ones(theta.shape)
         return x, y, z
 
-    @property
-    def volume(self):
-        """
-        retourne le volume de la superellipsoide.
-        """
-        r = 1./self.m1
-        t = 1./self.m2
-        return 8./3.*self.rx*self.ry*self.rz*r*t*beta_func(r, r)*beta_func(2*t, t)
-
-class Sphere(Superellipsoid):
-    """
-    Définit une sphère à partir d'une superellipsoide.
-    """
-    def __init__(self, r):
-        super(Sphere, self).__init__(r, r, r, 2, 2)
-
-    @property
-    def area(self):
-        """
-        retourne l'aire de la surface d'une sphère
-        """
-        return 4*math.pi*self.rx**2
